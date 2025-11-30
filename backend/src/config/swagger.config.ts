@@ -76,20 +76,7 @@ const options: swaggerJsdoc.Options = {
                 tvl: {
                   type: 'number',
                   description: 'Total Value Locked in cents',
-                  example: 63949,
-                },
-                currency: {
-                  type: 'string',
-                  example: 'cents',
-                },
-                filters: {
-                  type: 'object',
-                  properties: {
-                    chainId: {
-                      type: 'string',
-                      example: '1',
-                    },
-                  },
+                  example: 728288,
                 },
               },
             },
@@ -108,20 +95,7 @@ const options: swaggerJsdoc.Options = {
                 liquidity: {
                   type: 'number',
                   description: 'Available liquidity (supply - borrow) in cents',
-                  example: 38231,
-                },
-                currency: {
-                  type: 'string',
-                  example: 'cents',
-                },
-                filters: {
-                  type: 'object',
-                  properties: {
-                    chainId: {
-                      type: 'string',
-                      example: '1',
-                    },
-                  },
+                  example: 340005,
                 },
               },
             },
@@ -166,10 +140,6 @@ const options: swaggerJsdoc.Options = {
                 totalBorrowCents: {
                   type: 'number',
                   example: 5915,
-                },
-                currency: {
-                  type: 'string',
-                  example: 'cents',
                 },
               },
             },

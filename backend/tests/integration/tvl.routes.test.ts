@@ -55,7 +55,6 @@ describe('TVL Routes Integration', () => {
         success: true,
         data: {
           tvl: 63949, // 10482 + 20459 + 33008
-          currency: 'cents',
         },
       });
     });
@@ -71,8 +70,6 @@ describe('TVL Routes Integration', () => {
         success: true,
         data: {
           tvl: 30941, // 10482 + 20459
-          currency: 'cents',
-          filters: { chainId: '1' },
         },
       });
     });
@@ -88,8 +85,6 @@ describe('TVL Routes Integration', () => {
         success: true,
         data: {
           tvl: 33008,
-          currency: 'cents',
-          filters: { chainId: '56' },
         },
       });
     });
@@ -104,8 +99,6 @@ describe('TVL Routes Integration', () => {
         success: true,
         data: {
           tvl: 0,
-          currency: 'cents',
-          filters: { chainId: '99' },
         },
       });
     });
@@ -121,7 +114,6 @@ describe('TVL Routes Integration', () => {
         data: {
           // (10482-5915) + (20459-5712) + (33008-14091) = 4567 + 14747 + 18917 = 38231
           liquidity: 38231,
-          currency: 'cents',
         },
       });
     });
@@ -138,8 +130,6 @@ describe('TVL Routes Integration', () => {
         data: {
           // (10482-5915) + (20459-5712) = 4567 + 14747 = 19314
           liquidity: 19314,
-          currency: 'cents',
-          filters: { chainId: '1' },
         },
       });
     });
@@ -172,7 +162,6 @@ describe('TVL Routes Integration', () => {
         success: true,
         data: {
           tvl: 0,
-          currency: 'cents',
         },
       });
     });
@@ -187,7 +176,6 @@ describe('TVL Routes Integration', () => {
         success: true,
         data: {
           liquidity: 0,
-          currency: 'cents',
         },
       });
     });
@@ -204,8 +192,6 @@ describe('TVL Routes Integration', () => {
         data: {
           // 33008 - 14091 = 18917
           liquidity: 18917,
-          currency: 'cents',
-          filters: { chainId: '56' },
         },
       });
     });
@@ -229,7 +215,6 @@ describe('TVL Routes Integration', () => {
           liquidity: 4567, // 10482 - 5915
           totalSupplyCents: 10482,
           totalBorrowCents: 5915,
-          currency: 'cents',
         },
       });
     });
@@ -302,7 +287,6 @@ describe('TVL Routes Integration', () => {
           liquidity: 4567,
           totalSupplyCents: 10482,
           totalBorrowCents: 5915,
-          currency: 'cents',
         },
       });
     });
@@ -324,7 +308,6 @@ describe('TVL Routes Integration', () => {
           liquidity: 4567,
           totalSupplyCents: 10482,
           totalBorrowCents: 5915,
-          currency: 'cents',
         },
       });
     });
@@ -371,7 +354,6 @@ describe('TVL Routes Integration', () => {
           liquidity: 30000,
           totalSupplyCents: 50000,
           totalBorrowCents: 20000,
-          currency: 'cents',
         },
       });
     });

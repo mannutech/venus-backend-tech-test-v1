@@ -23,9 +23,7 @@ export class TvlController {
         res.json({
           success: true,
           data: {
-            liquidity,
-            currency: 'cents',
-            ...(chainId && { filters: { chainId } }),
+            liquidity: Number(liquidity),
           },
         });
         return;
@@ -35,9 +33,7 @@ export class TvlController {
       res.json({
         success: true,
         data: {
-          tvl,
-          currency: 'cents',
-          ...(chainId && { filters: { chainId } }),
+          tvl: Number(tvl),
         },
       });
     } catch (error) {
@@ -65,7 +61,6 @@ export class TvlController {
           liquidity: market.liquidity,
           totalSupplyCents: market.totalSupplyCents,
           totalBorrowCents: market.totalBorrowCents,
-          currency: 'cents',
         },
       });
     } catch (error) {

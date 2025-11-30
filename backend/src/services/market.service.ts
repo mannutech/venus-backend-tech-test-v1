@@ -38,22 +38,22 @@ export class MarketService {
     private readonly logger: Logger
   ) {}
 
-  async getTvl(chainId?: ChainId): Promise<number> {
+  async getTvl(chainId?: ChainId): Promise<bigint> {
     this.logger.debug({ chainId }, 'Calculating TVL');
     const markets = await this.repository.findAll(chainId);
-    const tvl = markets.reduce((sum, market) => sum + Number(market.totalSupplyCents), 0);
-    this.logger.info({ chainId, tvl, marketCount: markets.length }, 'TVL calculated');
+    const tvl = markets.reduce((sum, market) => sum + BigInt(market.totalSupplyCents), 0n);
+    this.logger.info({ chainId, tvl: tvl.toString(), marketCount: markets.length }, 'TVL calculated');
     return tvl;
   }
 
-  async getLiquidity(chainId?: ChainId): Promise<number> {
+  async getLiquidity(chainId?: ChainId): Promise<bigint> {
     this.logger.debug({ chainId }, 'Calculating liquidity');
     const markets = await this.repository.findAll(chainId);
     const liquidity = markets.reduce(
-      (sum, market) => sum + (Number(market.totalSupplyCents) - Number(market.totalBorrowCents)),
-      0
+      (sum, market) => sum + (BigInt(market.totalSupplyCents) - BigInt(market.totalBorrowCents)),
+      0n
     );
-    this.logger.info({ chainId, liquidity, marketCount: markets.length }, 'Liquidity calculated');
+    this.logger.info({ chainId, liquidity: liquidity.toString(), marketCount: markets.length }, 'Liquidity calculated');
     return liquidity;
   }
 

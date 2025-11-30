@@ -44,12 +44,12 @@ describe('MarketService', () => {
   });
 
   describe('getTvl', () => {
-    it('should return sum of all totalSupplyCents', async () => {
+    it('should return sum of all totalSupplyCents as BigInt', async () => {
       repository.findAll.mockResolvedValue(mockMarkets);
 
       const result = await service.getTvl();
 
-      expect(result).toBe(45000); // 10000 + 20000 + 15000
+      expect(result).toBe(45000n); // 10000 + 20000 + 15000
       expect(repository.findAll).toHaveBeenCalledWith(undefined);
     });
 
@@ -59,27 +59,27 @@ describe('MarketService', () => {
 
       const result = await service.getTvl('1');
 
-      expect(result).toBe(30000); // 10000 + 20000
+      expect(result).toBe(30000n); // 10000 + 20000
       expect(repository.findAll).toHaveBeenCalledWith('1');
     });
 
-    it('should return 0 when no markets found', async () => {
+    it('should return 0n when no markets found', async () => {
       repository.findAll.mockResolvedValue([]);
 
       const result = await service.getTvl();
 
-      expect(result).toBe(0);
+      expect(result).toBe(0n);
     });
   });
 
   describe('getLiquidity', () => {
-    it('should return sum of (totalSupplyCents - totalBorrowCents)', async () => {
+    it('should return sum of (totalSupplyCents - totalBorrowCents) as BigInt', async () => {
       repository.findAll.mockResolvedValue(mockMarkets);
 
       const result = await service.getLiquidity();
 
       // (10000-3000) + (20000-5000) + (15000-4000) = 7000 + 15000 + 11000 = 33000
-      expect(result).toBe(33000);
+      expect(result).toBe(33000n);
       expect(repository.findAll).toHaveBeenCalledWith(undefined);
     });
 
@@ -89,16 +89,16 @@ describe('MarketService', () => {
 
       const result = await service.getLiquidity('56');
 
-      expect(result).toBe(11000); // 15000 - 4000
+      expect(result).toBe(11000n); // 15000 - 4000
       expect(repository.findAll).toHaveBeenCalledWith('56');
     });
 
-    it('should return 0 when no markets found', async () => {
+    it('should return 0n when no markets found', async () => {
       repository.findAll.mockResolvedValue([]);
 
       const result = await service.getLiquidity();
 
-      expect(result).toBe(0);
+      expect(result).toBe(0n);
     });
   });
 
