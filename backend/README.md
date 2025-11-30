@@ -1,0 +1,292 @@
+# TVL API
+
+A TypeScript/Express REST API for querying Total Value Locked (TVL) and liquidity metrics across DeFi markets.
+
+## Features
+
+- Query total TVL across all markets
+- Filter TVL by blockchain chain ID
+- Calculate available liquidity (supply - borrow)
+- Get detailed market information by name
+- OpenAPI/Swagger documentation
+- Structured logging with Pino
+- Input validation with Zod
+- TypeORM with MySQL
+
+## Tech Stack
+
+- **Runtime**: Node.js 18+
+- **Language**: TypeScript 5
+- **Framework**: Express.js
+- **Database**: MySQL 8 with TypeORM
+- **Validation**: Zod
+- **Logging**: Pino
+- **Testing**: Jest, Supertest
+- **Documentation**: Swagger/OpenAPI
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- Yarn
+- Docker & Docker Compose (for containerized setup)
+
+### Environment Setup
+
+1. Copy the environment template:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Update `.env` with your database credentials:
+   ```
+   NODE_ENV=development
+   PORT=8181
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_USER=app_user
+   DB_PASSWORD=your_password
+   DB_NAME=app_db
+   ```
+
+### Local Development
+
+```bash
+# Install dependencies
+yarn install
+
+# Run in development mode (with hot reload)
+yarn dev
+
+# Build for production
+yarn build
+
+# Run production build
+yarn start
+```
+
+### Docker Setup
+
+```bash
+# Start all services (API, MySQL, phpMyAdmin)
+docker-compose up --build
+
+# Start in detached mode
+docker-compose up -d --build
+
+# Stop services
+docker-compose down
+
+# Stop and remove volumes
+docker-compose down -v
+```
+
+### Running Tests
+
+```bash
+# Run all tests
+yarn test
+
+# Run tests in watch mode
+yarn test:watch
+
+# Run tests with coverage
+yarn test:coverage
+```
+
+## API Endpoints
+
+### Base URL
+- Local: `http://localhost:8181`
+- API Version: `/api/v1`
+
+### Documentation
+- Swagger UI: `http://localhost:8181/api-docs`
+- OpenAPI JSON: `http://localhost:8181/api-docs.json`
+
+### Endpoints
+
+#### GET /api/v1/tvl
+Get Total Value Locked across all markets.
+
+**Query Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| chainId | string | No | Filter by blockchain chain ID |
+| metric | string | No | `tvl` (default) or `liquidity` |
+
+**Examples:**
+```bash
+# Get total TVL
+curl http://localhost:8181/api/v1/tvl
+
+# Get TVL for Ethereum (chain ID 1)
+curl http://localhost:8181/api/v1/tvl?chainId=1
+
+# Get liquidity instead of TVL
+curl http://localhost:8181/api/v1/tvl?metric=liquidity
+
+# Get liquidity for BSC (chain ID 56)
+curl http://localhost:8181/api/v1/tvl?chainId=56&metric=liquidity
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "tvl": 63949,
+    "currency": "cents",
+    "filters": {
+      "chainId": "1"
+    }
+  }
+}
+```
+
+#### GET /api/v1/markets
+Get detailed information for a specific market.
+
+**Query Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| name | string | Yes | Market name to look up |
+| metric | string | No | `tvl` (default) or `liquidity` |
+
+**Examples:**
+```bash
+# Get market details
+curl "http://localhost:8181/api/v1/markets?name=Token%2001"
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "Token 01",
+    "chainId": "1",
+    "tvl": 10482,
+    "liquidity": 4567,
+    "totalSupplyCents": 10482,
+    "totalBorrowCents": 5915,
+    "currency": "cents"
+  }
+}
+```
+
+### Error Responses
+
+**Validation Error (400):**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Invalid request parameters",
+    "details": [
+      {
+        "field": "metric",
+        "message": "Invalid enum value"
+      }
+    ]
+  }
+}
+```
+
+**Not Found (404):**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Market not found: NonExistent"
+  }
+}
+```
+
+**Internal Server Error (500):**
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INTERNAL_ERROR",
+    "message": "An unexpected error occurred"
+  }
+}
+```
+
+## Project Structure
+
+```
+backend/
+├── src/
+│   ├── config/          # Configuration (env, logger, swagger)
+│   ├── controllers/     # HTTP request handlers
+│   ├── database/        # Database connection and data source
+│   ├── entities/        # TypeORM entities
+│   ├── errors/          # Custom error classes
+│   ├── middleware/      # Express middleware
+│   ├── repositories/    # Data access layer
+│   ├── routes/          # API route definitions
+│   ├── schemas/         # Zod validation schemas
+│   ├── services/        # Business logic
+│   ├── app.ts           # Express app factory
+│   └── index.ts         # Application entry point
+├── tests/
+│   ├── integration/     # API integration tests
+│   └── unit/            # Unit tests
+├── Dockerfile           # Production Docker image
+├── docker-compose.yml   # Multi-service Docker setup
+├── jest.config.ts       # Jest configuration
+├── tsconfig.json        # TypeScript configuration
+└── package.json
+```
+
+## Architecture
+
+The application follows a layered architecture with dependency injection:
+
+```
+Routes → Controllers → Services → Repositories → Database
+                ↓
+           Middleware (Validation, Error Handling)
+```
+
+- **Controllers**: Handle HTTP concerns, delegate to services
+- **Services**: Business logic and calculations
+- **Repositories**: Data access abstraction over TypeORM
+- **Middleware**: Cross-cutting concerns (validation, error handling, logging)
+
+## Services
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| API | http://localhost:8181 | TVL API |
+| Swagger | http://localhost:8181/api-docs | API Documentation |
+| phpMyAdmin | http://localhost:8080 | Database management UI |
+| MySQL | localhost:3306 | Database |
+
+## Development
+
+### Adding a New Endpoint
+
+1. Add validation schema in `src/schemas/`
+2. Add service method in `src/services/`
+3. Add controller method in `src/controllers/`
+4. Add route in `src/routes/`
+5. Add OpenAPI documentation as JSDoc comment
+6. Write tests (unit + integration)
+
+### Code Style
+
+- Use TypeScript strict mode
+- Follow existing patterns for consistency
+- Add JSDoc comments for public methods
+- Use dependency injection for testability
+
+## License
+
+Private

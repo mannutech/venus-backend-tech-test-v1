@@ -1,0 +1,547 @@
+{
+  "info": {
+    "_postman_id": "tvl-api-collection",
+    "name": "TVL API",
+    "description": "Total Value Locked (TVL) API endpoints for market data",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8181",
+      "type": "string"
+    },
+    {
+      "key": "apiVersion",
+      "value": "v1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "TVL Endpoints",
+      "item": [
+        {
+          "name": "Get Total TVL",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/tvl",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "tvl"]
+            },
+            "description": "Returns the total TVL (sum of all total_supply_cents) across all markets"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"tvl\": 738834,\n    \"currency\": \"cents\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get TVL - Filter by Chain ID 1 (Ethereum)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/tvl?chainId=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "tvl"],
+              "query": [
+                {
+                  "key": "chainId",
+                  "value": "1",
+                  "description": "Filter by Ethereum chain"
+                }
+              ]
+            },
+            "description": "Returns TVL filtered by chain ID 1 (Ethereum)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"tvl\": 317404,\n    \"currency\": \"cents\",\n    \"filters\": {\n      \"chainId\": \"1\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get TVL - Filter by Chain ID 56 (BSC)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/tvl?chainId=56",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "tvl"],
+              "query": [
+                {
+                  "key": "chainId",
+                  "value": "56",
+                  "description": "Filter by BSC chain"
+                }
+              ]
+            },
+            "description": "Returns TVL filtered by chain ID 56 (Binance Smart Chain)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"tvl\": 421430,\n    \"currency\": \"cents\",\n    \"filters\": {\n      \"chainId\": \"56\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get TVL - Non-existent Chain ID (Returns 0)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/tvl?chainId=99",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "tvl"],
+              "query": [
+                {
+                  "key": "chainId",
+                  "value": "99",
+                  "description": "Non-existent chain ID - returns 0 TVL"
+                }
+              ]
+            },
+            "description": "Returns 0 TVL for a chain ID that has no markets (no validation error)"
+          },
+          "response": [
+            {
+              "name": "Success Response - Empty Data",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"tvl\": 0,\n    \"currency\": \"cents\",\n    \"filters\": {\n      \"chainId\": \"99\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Total Liquidity",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/tvl?metric=liquidity",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "tvl"],
+              "query": [
+                {
+                  "key": "metric",
+                  "value": "liquidity",
+                  "description": "Calculate liquidity (supply - borrow)"
+                }
+              ]
+            },
+            "description": "Returns total liquidity (sum of total_supply_cents - total_borrow_cents)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"liquidity\": 539765,\n    \"currency\": \"cents\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Liquidity - Filter by Chain ID 1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/tvl?chainId=1&metric=liquidity",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "tvl"],
+              "query": [
+                {
+                  "key": "chainId",
+                  "value": "1",
+                  "description": "Filter by Ethereum chain"
+                },
+                {
+                  "key": "metric",
+                  "value": "liquidity",
+                  "description": "Calculate liquidity"
+                }
+              ]
+            },
+            "description": "Returns liquidity filtered by chain ID 1"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"liquidity\": 225107,\n    \"currency\": \"cents\",\n    \"filters\": {\n      \"chainId\": \"1\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Liquidity - Filter by Chain ID 56",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/tvl?chainId=56&metric=liquidity",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "tvl"],
+              "query": [
+                {
+                  "key": "chainId",
+                  "value": "56",
+                  "description": "Filter by BSC chain"
+                },
+                {
+                  "key": "metric",
+                  "value": "liquidity",
+                  "description": "Calculate liquidity"
+                }
+              ]
+            },
+            "description": "Returns liquidity filtered by chain ID 56"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"liquidity\": 314658,\n    \"currency\": \"cents\",\n    \"filters\": {\n      \"chainId\": \"56\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get TVL - Explicit metric=tvl",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/tvl?metric=tvl",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "tvl"],
+              "query": [
+                {
+                  "key": "metric",
+                  "value": "tvl",
+                  "description": "Explicitly request TVL metric (default)"
+                }
+              ]
+            },
+            "description": "Returns TVL with explicit metric parameter (same as default)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"tvl\": 738834,\n    \"currency\": \"cents\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get TVL - Invalid Metric",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/tvl?metric=invalid",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "tvl"],
+              "query": [
+                {
+                  "key": "metric",
+                  "value": "invalid",
+                  "description": "Invalid metric value"
+                }
+              ]
+            },
+            "description": "Demonstrates validation error for invalid metric"
+          },
+          "response": [
+            {
+              "name": "Validation Error",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"Invalid request parameters\",\n    \"details\": [\n      {\n        \"field\": \"metric\",\n        \"message\": \"Invalid enum value. Expected 'tvl' | 'liquidity', received 'invalid'\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Markets Endpoints",
+      "item": [
+        {
+          "name": "Get Single Market by Name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/markets?name=Token 01",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "markets"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Token 01",
+                  "description": "Market name to look up"
+                }
+              ]
+            },
+            "description": "Returns detailed data for a single market by name"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Token 01\",\n    \"chainId\": \"1\",\n    \"tvl\": 10482,\n    \"liquidity\": 4567,\n    \"totalSupplyCents\": 10482,\n    \"totalBorrowCents\": 5915,\n    \"currency\": \"cents\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Single Market - URL Encoded Name",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/markets?name=Token%2001",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "markets"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Token%2001",
+                  "description": "URL encoded market name"
+                }
+              ]
+            },
+            "description": "Returns market data using URL encoded name (space as %20)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Token 01\",\n    \"chainId\": \"1\",\n    \"tvl\": 10482,\n    \"liquidity\": 4567,\n    \"totalSupplyCents\": 10482,\n    \"totalBorrowCents\": 5915,\n    \"currency\": \"cents\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Single Market - With metric=tvl",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/markets?name=Token 01&metric=tvl",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "markets"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Token 01",
+                  "description": "Market name"
+                },
+                {
+                  "key": "metric",
+                  "value": "tvl",
+                  "description": "TVL metric"
+                }
+              ]
+            },
+            "description": "Returns market data with explicit TVL metric"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Token 01\",\n    \"chainId\": \"1\",\n    \"tvl\": 10482,\n    \"liquidity\": 4567,\n    \"totalSupplyCents\": 10482,\n    \"totalBorrowCents\": 5915,\n    \"currency\": \"cents\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Single Market - With metric=liquidity",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/markets?name=Token 01&metric=liquidity",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "markets"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Token 01",
+                  "description": "Market name"
+                },
+                {
+                  "key": "metric",
+                  "value": "liquidity",
+                  "description": "Liquidity metric"
+                }
+              ]
+            },
+            "description": "Returns market data with liquidity metric"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Token 01\",\n    \"chainId\": \"1\",\n    \"tvl\": 10482,\n    \"liquidity\": 4567,\n    \"totalSupplyCents\": 10482,\n    \"totalBorrowCents\": 5915,\n    \"currency\": \"cents\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Single Market - Different Token (Token 14)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/markets?name=Token 14",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "markets"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Token 14",
+                  "description": "Market name on BSC chain"
+                }
+              ]
+            },
+            "description": "Returns data for a market on BSC chain (chainId 56)"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"data\": {\n    \"id\": 14,\n    \"name\": \"Token 14\",\n    \"chainId\": \"56\",\n    \"tvl\": 33008,\n    \"liquidity\": 18917,\n    \"totalSupplyCents\": 33008,\n    \"totalBorrowCents\": 14091,\n    \"currency\": \"cents\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Single Market - Not Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/markets?name=NonExistentToken",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "markets"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "NonExistentToken",
+                  "description": "Non-existent market name"
+                }
+              ]
+            },
+            "description": "Demonstrates 404 error when market is not found"
+          },
+          "response": [
+            {
+              "name": "Not Found Error",
+              "status": "Not Found",
+              "code": 404,
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"NOT_FOUND\",\n    \"message\": \"Market not found: NonExistentToken\"\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Single Market - Missing Name Parameter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/markets",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "markets"]
+            },
+            "description": "Demonstrates validation error when name parameter is missing"
+          },
+          "response": [
+            {
+              "name": "Validation Error",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"Invalid request parameters\",\n    \"details\": [\n      {\n        \"field\": \"name\",\n        \"message\": \"Required\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Single Market - Empty Name Parameter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/markets?name=",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "markets"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "",
+                  "description": "Empty market name"
+                }
+              ]
+            },
+            "description": "Demonstrates validation error when name is empty"
+          },
+          "response": [
+            {
+              "name": "Validation Error",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"Invalid request parameters\",\n    \"details\": [\n      {\n        \"field\": \"name\",\n        \"message\": \"String must contain at least 1 character(s)\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Single Market - Invalid Metric",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/markets?name=Token 01&metric=invalid",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "markets"],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Token 01",
+                  "description": "Market name"
+                },
+                {
+                  "key": "metric",
+                  "value": "invalid",
+                  "description": "Invalid metric value"
+                }
+              ]
+            },
+            "description": "Demonstrates validation error for invalid metric on markets endpoint"
+          },
+          "response": [
+            {
+              "name": "Validation Error",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"success\": false,\n  \"error\": {\n    \"code\": \"VALIDATION_ERROR\",\n    \"message\": \"Invalid request parameters\",\n    \"details\": [\n      {\n        \"field\": \"metric\",\n        \"message\": \"Invalid enum value. Expected 'tvl' | 'liquidity', received 'invalid'\"\n      }\n    ]\n  }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
