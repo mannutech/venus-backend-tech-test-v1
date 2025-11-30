@@ -3,6 +3,11 @@ import { Market } from '../entities/market.entity';
 import type { ChainId } from '../schemas/tvl.schema';
 import type { Logger } from '../config/logger.config';
 
+export interface AggregateResult {
+  totalSupply: string | null;
+  totalBorrow: string | null;
+}
+
 export class MarketRepository {
   constructor(
     private readonly repository: Repository<Market>,
@@ -10,20 +15,43 @@ export class MarketRepository {
   ) {}
 
   /**
-   * Fetches all markets, optionally filtered by chainId.
-   *
-   * TODO: Implement pagination for large datasets
-   * - Add `page` and `limit` parameters
-   * - Return { data: Market[], total: number, page: number, limit: number }
-   * - Use repository.findAndCount() for total count
-   * - Example: findAll(chainId, { page: 1, limit: 100 })
+   * Calculates TVL (total supply) using SQL SUM aggregation.
+   * More efficient than fetching all rows for large datasets.
    */
-  async findAll(chainId?: ChainId): Promise<Market[]> {
-    this.logger.debug({ chainId }, 'Finding all markets');
+  async sumTotalSupply(chainId?: ChainId): Promise<bigint> {
+    this.logger.debug({ chainId }, 'Calculating sum of total supply');
+
+    const qb = this.repository
+      .createQueryBuilder('market')
+      .select('SUM(market.total_supply_cents)', 'totalSupply');
+
     if (chainId) {
-      return this.repository.find({ where: { chainId } });
+      qb.where('market.chain_id = :chainId', { chainId });
     }
-    return this.repository.find();
+
+    const result = await qb.getRawOne<AggregateResult>();
+    return BigInt(result?.totalSupply || '0');
+  }
+
+  /**
+   * Calculates liquidity (supply - borrow) using SQL SUM aggregation.
+   */
+  async sumLiquidity(chainId?: ChainId): Promise<bigint> {
+    this.logger.debug({ chainId }, 'Calculating sum of liquidity');
+
+    const qb = this.repository
+      .createQueryBuilder('market')
+      .select('SUM(market.total_supply_cents)', 'totalSupply')
+      .addSelect('SUM(market.total_borrow_cents)', 'totalBorrow');
+
+    if (chainId) {
+      qb.where('market.chain_id = :chainId', { chainId });
+    }
+
+    const result = await qb.getRawOne<AggregateResult>();
+    const supply = BigInt(result?.totalSupply || '0');
+    const borrow = BigInt(result?.totalBorrow || '0');
+    return supply - borrow;
   }
 
   async findByName(name: string): Promise<Market | null> {

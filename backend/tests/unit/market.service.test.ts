@@ -10,32 +10,14 @@ describe('MarketService', () => {
   let repository: MockProxy<MarketRepository>;
   let logger: MockProxy<Logger>;
 
-  const mockMarkets: Market[] = [
-    {
-      id: 1,
-      name: 'Token 01',
-      chainId: '1',
-      totalSupplyCents: 10000,
-      totalBorrowCents: 3000,
-      createdAt: new Date(),
-    },
-    {
-      id: 2,
-      name: 'Token 02',
-      chainId: '1',
-      totalSupplyCents: 20000,
-      totalBorrowCents: 5000,
-      createdAt: new Date(),
-    },
-    {
-      id: 3,
-      name: 'Token 03',
-      chainId: '56',
-      totalSupplyCents: 15000,
-      totalBorrowCents: 4000,
-      createdAt: new Date(),
-    },
-  ];
+  const mockMarket: Market = {
+    id: 1,
+    name: 'Token 01',
+    chainId: '1',
+    totalSupplyCents: 10000,
+    totalBorrowCents: 3000,
+    createdAt: new Date(),
+  };
 
   beforeEach(() => {
     repository = mock<MarketRepository>();
@@ -44,27 +26,26 @@ describe('MarketService', () => {
   });
 
   describe('getTvl', () => {
-    it('should return sum of all totalSupplyCents as BigInt', async () => {
-      repository.findAll.mockResolvedValue(mockMarkets);
+    it('should return TVL from repository aggregation', async () => {
+      repository.sumTotalSupply.mockResolvedValue(45000n);
 
       const result = await service.getTvl();
 
-      expect(result).toBe(45000n); // 10000 + 20000 + 15000
-      expect(repository.findAll).toHaveBeenCalledWith(undefined);
+      expect(result).toBe(45000n);
+      expect(repository.sumTotalSupply).toHaveBeenCalledWith(undefined);
     });
 
-    it('should return sum filtered by chainId', async () => {
-      const chain1Markets = mockMarkets.filter((m) => m.chainId === '1');
-      repository.findAll.mockResolvedValue(chain1Markets);
+    it('should pass chainId to repository', async () => {
+      repository.sumTotalSupply.mockResolvedValue(30000n);
 
       const result = await service.getTvl('1');
 
-      expect(result).toBe(30000n); // 10000 + 20000
-      expect(repository.findAll).toHaveBeenCalledWith('1');
+      expect(result).toBe(30000n);
+      expect(repository.sumTotalSupply).toHaveBeenCalledWith('1');
     });
 
     it('should return 0n when no markets found', async () => {
-      repository.findAll.mockResolvedValue([]);
+      repository.sumTotalSupply.mockResolvedValue(0n);
 
       const result = await service.getTvl();
 
@@ -73,28 +54,26 @@ describe('MarketService', () => {
   });
 
   describe('getLiquidity', () => {
-    it('should return sum of (totalSupplyCents - totalBorrowCents) as BigInt', async () => {
-      repository.findAll.mockResolvedValue(mockMarkets);
+    it('should return liquidity from repository aggregation', async () => {
+      repository.sumLiquidity.mockResolvedValue(33000n);
 
       const result = await service.getLiquidity();
 
-      // (10000-3000) + (20000-5000) + (15000-4000) = 7000 + 15000 + 11000 = 33000
       expect(result).toBe(33000n);
-      expect(repository.findAll).toHaveBeenCalledWith(undefined);
+      expect(repository.sumLiquidity).toHaveBeenCalledWith(undefined);
     });
 
-    it('should return sum filtered by chainId', async () => {
-      const chain56Markets = mockMarkets.filter((m) => m.chainId === '56');
-      repository.findAll.mockResolvedValue(chain56Markets);
+    it('should pass chainId to repository', async () => {
+      repository.sumLiquidity.mockResolvedValue(11000n);
 
       const result = await service.getLiquidity('56');
 
-      expect(result).toBe(11000n); // 15000 - 4000
-      expect(repository.findAll).toHaveBeenCalledWith('56');
+      expect(result).toBe(11000n);
+      expect(repository.sumLiquidity).toHaveBeenCalledWith('56');
     });
 
     it('should return 0n when no markets found', async () => {
-      repository.findAll.mockResolvedValue([]);
+      repository.sumLiquidity.mockResolvedValue(0n);
 
       const result = await service.getLiquidity();
 
@@ -104,8 +83,7 @@ describe('MarketService', () => {
 
   describe('getMarket', () => {
     it('should return market data when found', async () => {
-      const market = mockMarkets[0];
-      repository.findByName.mockResolvedValue(market);
+      repository.findByName.mockResolvedValue(mockMarket);
 
       const result = await service.getMarket('Token 01');
 

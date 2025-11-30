@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { Express } from 'express';
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { createApp } from '../../src/app';
 import { Market } from '../../src/entities/market.entity';
@@ -10,43 +10,34 @@ describe('TVL Routes Integration', () => {
   let app: Express;
   let mockRepository: MockProxy<Repository<Market>>;
   let mockLogger: MockProxy<Logger>;
+  let mockQueryBuilder: MockProxy<SelectQueryBuilder<Market>>;
 
-  const mockMarkets: Market[] = [
-    {
-      id: 1,
-      name: 'Token 01',
-      chainId: '1',
-      totalSupplyCents: 10482,
-      totalBorrowCents: 5915,
-      createdAt: new Date(),
-    },
-    {
-      id: 2,
-      name: 'Token 02',
-      chainId: '1',
-      totalSupplyCents: 20459,
-      totalBorrowCents: 5712,
-      createdAt: new Date(),
-    },
-    {
-      id: 3,
-      name: 'Token 14',
-      chainId: '56',
-      totalSupplyCents: 33008,
-      totalBorrowCents: 14091,
-      createdAt: new Date(),
-    },
-  ];
+  const mockMarket: Market = {
+    id: 1,
+    name: 'Token 01',
+    chainId: '1',
+    totalSupplyCents: 10482,
+    totalBorrowCents: 5915,
+    createdAt: new Date(),
+  };
 
   beforeEach(() => {
     mockRepository = mock<Repository<Market>>();
     mockLogger = mock<Logger>();
+    mockQueryBuilder = mock<SelectQueryBuilder<Market>>();
+
+    // Setup query builder chain
+    mockQueryBuilder.select.mockReturnThis();
+    mockQueryBuilder.addSelect.mockReturnThis();
+    mockQueryBuilder.where.mockReturnThis();
+    mockRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
+
     app = createApp({ marketEntityRepository: mockRepository, logger: mockLogger });
   });
 
   describe('GET /api/v1/tvl', () => {
     it('should return 200 with total TVL', async () => {
-      mockRepository.find.mockResolvedValue(mockMarkets);
+      mockQueryBuilder.getRawOne.mockResolvedValue({ totalSupply: '63949', totalBorrow: null });
 
       const response = await request(app).get('/api/v1/tvl');
 
@@ -54,14 +45,13 @@ describe('TVL Routes Integration', () => {
       expect(response.body).toEqual({
         success: true,
         data: {
-          tvl: 63949, // 10482 + 20459 + 33008
+          tvl: 63949,
         },
       });
     });
 
     it('should return 200 with TVL filtered by chainId=1', async () => {
-      const chain1Markets = mockMarkets.filter((m) => m.chainId === '1');
-      mockRepository.find.mockResolvedValue(chain1Markets);
+      mockQueryBuilder.getRawOne.mockResolvedValue({ totalSupply: '30941', totalBorrow: null });
 
       const response = await request(app).get('/api/v1/tvl?chainId=1');
 
@@ -69,14 +59,14 @@ describe('TVL Routes Integration', () => {
       expect(response.body).toEqual({
         success: true,
         data: {
-          tvl: 30941, // 10482 + 20459
+          tvl: 30941,
         },
       });
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith('market.chain_id = :chainId', { chainId: '1' });
     });
 
     it('should return 200 with TVL filtered by chainId=56', async () => {
-      const chain56Markets = mockMarkets.filter((m) => m.chainId === '56');
-      mockRepository.find.mockResolvedValue(chain56Markets);
+      mockQueryBuilder.getRawOne.mockResolvedValue({ totalSupply: '33008', totalBorrow: null });
 
       const response = await request(app).get('/api/v1/tvl?chainId=56');
 
@@ -90,7 +80,7 @@ describe('TVL Routes Integration', () => {
     });
 
     it('should return 200 with 0 TVL for non-existent chainId', async () => {
-      mockRepository.find.mockResolvedValue([]);
+      mockQueryBuilder.getRawOne.mockResolvedValue({ totalSupply: null, totalBorrow: null });
 
       const response = await request(app).get('/api/v1/tvl?chainId=99');
 
@@ -104,7 +94,7 @@ describe('TVL Routes Integration', () => {
     });
 
     it('should return 200 with liquidity when metric=liquidity', async () => {
-      mockRepository.find.mockResolvedValue(mockMarkets);
+      mockQueryBuilder.getRawOne.mockResolvedValue({ totalSupply: '63949', totalBorrow: '25718' });
 
       const response = await request(app).get('/api/v1/tvl?metric=liquidity');
 
@@ -112,15 +102,13 @@ describe('TVL Routes Integration', () => {
       expect(response.body).toEqual({
         success: true,
         data: {
-          // (10482-5915) + (20459-5712) + (33008-14091) = 4567 + 14747 + 18917 = 38231
-          liquidity: 38231,
+          liquidity: 38231, // 63949 - 25718
         },
       });
     });
 
     it('should return 200 with liquidity filtered by chainId', async () => {
-      const chain1Markets = mockMarkets.filter((m) => m.chainId === '1');
-      mockRepository.find.mockResolvedValue(chain1Markets);
+      mockQueryBuilder.getRawOne.mockResolvedValue({ totalSupply: '30941', totalBorrow: '11627' });
 
       const response = await request(app).get('/api/v1/tvl?chainId=1&metric=liquidity');
 
@@ -128,8 +116,7 @@ describe('TVL Routes Integration', () => {
       expect(response.body).toEqual({
         success: true,
         data: {
-          // (10482-5915) + (20459-5712) = 4567 + 14747 = 19314
-          liquidity: 19314,
+          liquidity: 19314, // 30941 - 11627
         },
       });
     });
@@ -153,7 +140,7 @@ describe('TVL Routes Integration', () => {
     });
 
     it('should return 0 TVL when no markets exist', async () => {
-      mockRepository.find.mockResolvedValue([]);
+      mockQueryBuilder.getRawOne.mockResolvedValue({ totalSupply: null, totalBorrow: null });
 
       const response = await request(app).get('/api/v1/tvl');
 
@@ -167,7 +154,7 @@ describe('TVL Routes Integration', () => {
     });
 
     it('should return 0 liquidity when no markets exist', async () => {
-      mockRepository.find.mockResolvedValue([]);
+      mockQueryBuilder.getRawOne.mockResolvedValue({ totalSupply: null, totalBorrow: null });
 
       const response = await request(app).get('/api/v1/tvl?metric=liquidity');
 
@@ -181,8 +168,7 @@ describe('TVL Routes Integration', () => {
     });
 
     it('should return 200 with liquidity filtered by chainId=56', async () => {
-      const chain56Markets = mockMarkets.filter((m) => m.chainId === '56');
-      mockRepository.find.mockResolvedValue(chain56Markets);
+      mockQueryBuilder.getRawOne.mockResolvedValue({ totalSupply: '33008', totalBorrow: '14091' });
 
       const response = await request(app).get('/api/v1/tvl?chainId=56&metric=liquidity');
 
@@ -190,8 +176,7 @@ describe('TVL Routes Integration', () => {
       expect(response.body).toEqual({
         success: true,
         data: {
-          // 33008 - 14091 = 18917
-          liquidity: 18917,
+          liquidity: 18917, // 33008 - 14091
         },
       });
     });
@@ -199,8 +184,7 @@ describe('TVL Routes Integration', () => {
 
   describe('GET /api/v1/markets', () => {
     it('should return 200 with market data when found', async () => {
-      const market = mockMarkets[0];
-      mockRepository.findOne.mockResolvedValue(market);
+      mockRepository.findOne.mockResolvedValue(mockMarket);
 
       const response = await request(app).get('/api/v1/markets?name=Token%2001');
 
@@ -271,8 +255,7 @@ describe('TVL Routes Integration', () => {
     });
 
     it('should return 200 with market data when metric=tvl is provided', async () => {
-      const market = mockMarkets[0];
-      mockRepository.findOne.mockResolvedValue(market);
+      mockRepository.findOne.mockResolvedValue(mockMarket);
 
       const response = await request(app).get('/api/v1/markets?name=Token%2001&metric=tvl');
 
@@ -292,8 +275,7 @@ describe('TVL Routes Integration', () => {
     });
 
     it('should return 200 with market data when metric=liquidity is provided', async () => {
-      const market = mockMarkets[0];
-      mockRepository.findOne.mockResolvedValue(market);
+      mockRepository.findOne.mockResolvedValue(mockMarket);
 
       const response = await request(app).get('/api/v1/markets?name=Token%2001&metric=liquidity');
 

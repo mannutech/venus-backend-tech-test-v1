@@ -145,11 +145,7 @@ curl http://localhost:8181/api/v1/tvl?chainId=56&metric=liquidity
 {
   "success": true,
   "data": {
-    "tvl": 63949,
-    "currency": "cents",
-    "filters": {
-      "chainId": "1"
-    }
+    "tvl": 728288
   }
 }
 ```
@@ -180,8 +176,7 @@ curl "http://localhost:8181/api/v1/markets?name=Token%2001"
     "tvl": 10482,
     "liquidity": 4567,
     "totalSupplyCents": 10482,
-    "totalBorrowCents": 5915,
-    "currency": "cents"
+    "totalBorrowCents": 5915
   }
 }
 ```
@@ -302,6 +297,38 @@ Routes → Controllers → Services → Repositories → Database
 - Follow existing patterns for consistency
 - Add JSDoc comments for public methods
 - Use dependency injection for testability
+
+## Future Improvements
+
+The following enhancements are planned or recommended for production readiness:
+
+### 1. Caching Layer
+Currently, every request queries the database. Consider implementing:
+- **Redis cache** (recommended for distributed/multi-instance deployments)
+  - Cache keys: `tvl:${chainId || 'all'}`, `liquidity:${chainId || 'all'}`
+  - TTL: 30-60 seconds for real-time data
+- **In-memory cache** (suitable for single-instance deployments)
+  - Use `node-cache` or `Map` with TTL
+
+### 2. BigInt Response Handling
+Currently using `Number()` conversion for JSON responses:
+- `Number.MAX_SAFE_INTEGER` = ~9 quadrillion (safe up to ~$90 trillion in cents)
+- Sufficient for current DeFi scale
+- If handling raw token amounts (wei/18 decimals), switch to string responses:
+  ```typescript
+  // Return as string for large numbers
+  res.json({ tvl: tvl.toString() })
+  ```
+
+### 3. Database Aggregation [DONE]
+Implemented SQL `SUM()` aggregation in repository layer for efficient calculations.
+- Consider adding database index on `chain_id` for filtered queries
+
+### 4. Additional Features
+- **Pagination**: Cursor-based pagination for listing all markets
+- **Rate Limiting**: Add at service or middleware level
+- **Health Check Endpoint**: `/health` for container orchestration
+- **Metrics**: Prometheus metrics for monitoring
 
 ## License
 
