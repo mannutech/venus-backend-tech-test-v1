@@ -2,6 +2,13 @@
 
 A TypeScript/Express REST API for querying Total Value Locked (TVL) and liquidity metrics across DeFi markets.
 
+## Live Demo
+
+- **API Base URL**: https://venus-backend-tech-test-v1-production.up.railway.app
+- **Swagger Documentation**: https://venus-backend-tech-test-v1-production.up.railway.app/api-docs
+- **OpenAPI JSON**: https://venus-backend-tech-test-v1-production.up.railway.app/api-docs.json
+
+
 ## Features
 
 - Query total TVL across all markets
@@ -98,12 +105,14 @@ yarn test:coverage
 ## API Endpoints
 
 ### Base URL
-- Local: `http://localhost:8181`
-- API Version: `/api/v1`
+- **Production**: `https://venus-backend-tech-test-v1-production.up.railway.app`
+- **Local**: `http://localhost:8181`
+- **API Version**: `/api/v1`
 
 ### Documentation
-- Swagger UI: `http://localhost:8181/api-docs`
-- OpenAPI JSON: `http://localhost:8181/api-docs.json`
+- **Production Swagger UI**: https://venus-backend-tech-test-v1-production.up.railway.app/api-docs
+- **Local Swagger UI**: `http://localhost:8181/api-docs`
+- **OpenAPI JSON**: `/api-docs.json`
 
 ### Endpoints
 
@@ -262,6 +271,13 @@ Routes → Controllers → Services → Repositories → Database
 
 ## Services
 
+### Production (Railway)
+| Service | URL |
+|---------|-----|
+| API | https://venus-backend-tech-test-v1-production.up.railway.app |
+| Swagger | https://venus-backend-tech-test-v1-production.up.railway.app/api-docs |
+
+### Local Development
 | Service | URL | Description |
 |---------|-----|-------------|
 | API | http://localhost:8181 | TVL API |

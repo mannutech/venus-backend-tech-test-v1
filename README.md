@@ -1,5 +1,10 @@
 # Venus - Backend Technical Test
 
+## Live Demo
+
+- **API Base URL**: https://venus-backend-tech-test-v1-production.up.railway.app
+- **Swagger Documentation**: https://venus-backend-tech-test-v1-production.up.railway.app/api-docs
+
 ## Solution
 
 The solution for this technical assessment, including setup instructions, features, architecture, and API documentation, is thoroughly detailed in the [backend/README.md](backend/README.md) file. Please refer to that document for all implementation information and guidance.
