@@ -8,6 +8,9 @@ RUN yarn install
 
 COPY . .
 
+RUN yarn build
+
 EXPOSE 8181
 
-CMD ["yarn", "dev"]
+# Run migrations then start the server
+CMD ["sh", "-c", "yarn migration:run:prod && yarn start"]

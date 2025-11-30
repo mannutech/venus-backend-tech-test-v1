@@ -4,12 +4,17 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "start": "node dist/index.js",
+    "start": "node dist/src/index.js",
     "dev": "ts-node src/index.ts",
     "build": "tsc",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "migration:run": "ts-node -r dotenv/config ./node_modules/typeorm/cli.js migration:run -d src/database/migration-data-source.ts",
+    "migration:run:prod": "node ./node_modules/typeorm/cli.js migration:run -d dist/src/database/migration-data-source.js",
+    "migration:revert": "ts-node -r dotenv/config ./node_modules/typeorm/cli.js migration:revert -d src/database/migration-data-source.ts",
+    "migration:generate": "ts-node -r dotenv/config ./node_modules/typeorm/cli.js migration:generate -d src/database/migration-data-source.ts",
+    "migration:create": "ts-node ./node_modules/typeorm/cli.js migration:create"
   },
   "dependencies": {
     "cors": "^2.8.5",
